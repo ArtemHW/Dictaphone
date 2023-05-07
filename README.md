@@ -1,2 +1,2 @@
-# Dictaphone
+# Music Player
 ## Description
