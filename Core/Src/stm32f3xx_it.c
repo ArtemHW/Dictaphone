@@ -50,6 +50,7 @@ extern FRESULT     fres;                 //Result after operations
 extern char        buf[100];
 
 extern uint16_t tim17_counter;
+extern uint32_t adc_counter;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -63,11 +64,15 @@ extern uint16_t tim17_counter;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern DMA_HandleTypeDef hdma_adc1;
+extern DAC_HandleTypeDef hdac;
 extern DMA_HandleTypeDef hdma_tim17_ch1_up;
 extern TIM_HandleTypeDef htim6;
 extern TIM_HandleTypeDef htim17;
 /* USER CODE BEGIN EV */
 extern uint8_t buff_music[500];
+extern DWORD	old_fsize;
+extern  ADC_HandleTypeDef hadc1;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -220,6 +225,59 @@ void DMA1_Channel1_IRQHandler(void)
 	if(DMA1->ISR & DMA_ISR_TCIF1 == DMA_ISR_TCIF1)
 	{
 		DMA1->IFCR |= DMA_IFCR_CTCIF1;
+		fil.fsize = old_fsize;
+		if (fres == FR_OK) {
+			UINT bytesWritten;
+			// Move the file pointer to the end of the file
+			f_lseek(&fil, f_size(&fil) /*sizeof(fil)*/);
+			DWORD size_of_fil;
+			size_of_fil = f_size(&fil);
+			printf("_ f_size(&fil) == %d \r\n", size_of_fil);
+			printf("    %d    ", buff_music[10]);
+			// Write data to the file
+			fres = f_write(&fil, buff_music, sizeof(buff_music), &bytesWritten);
+			if (fres == FR_OK) {
+				// Data written successfully
+				//f_close(&fil);  // Close the file
+				printf("Data written to file: \r\n");
+			} else {
+				// Error occurred while writing data
+				//f_close(&fil);  // Close the file
+				//printf("Error writing data to file: data_file.txt \r\n");
+			}
+		} else {
+			// Error occurred while opening the file
+			//printf("Error opening file: data_file.txt \r\n");
+		}
+	  old_fsize = fil.fsize;
+	  adc_counter++;
+		if(((GPIOC->IDR & GPIO_ODR_10) == 0) || !HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_10))
+		{
+			f_close(&fil);
+			HAL_Delay(10);
+			f_mount(NULL, "", 0);
+			HAL_TIM_Base_Stop_IT(&htim6);
+			HAL_DMA_Abort_IT(&hdma_adc1);
+			HAL_ADC_Stop(&hadc1);
+		}
+
+	}
+  /* USER CODE END DMA1_Channel1_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_adc1);
+  /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel1_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA1 channel7 global interrupt.
+  */
+void DMA1_Channel7_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel7_IRQn 0 */
+	if(DMA1->ISR & DMA_ISR_TCIF7 == DMA_ISR_TCIF7)
+	{
+		DMA1->IFCR |= DMA_IFCR_CTCIF7;
 		HAL_TIM_PWM_Stop_DMA(&htim17, TIM_CHANNEL_1);
 		UINT bytesRead;
 		fres = f_read(&fil, buff_music, sizeof(buff_music), &bytesRead);
@@ -231,11 +289,11 @@ void DMA1_Channel1_IRQHandler(void)
 			stop_play_music(&fil);
 		}
 	}
-  /* USER CODE END DMA1_Channel1_IRQn 0 */
+  /* USER CODE END DMA1_Channel7_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_tim17_ch1_up);
-  /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
+  /* USER CODE BEGIN DMA1_Channel7_IRQn 1 */
 
-  /* USER CODE END DMA1_Channel1_IRQn 1 */
+  /* USER CODE END DMA1_Channel7_IRQn 1 */
 }
 
 /**
@@ -301,11 +359,18 @@ void TIM6_DAC_IRQHandler(void)
 		{
 			printf("%d \r\n", HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_10));
 			GPIOC->ODR &= ~GPIO_IDR_3;
+			f_close(&fil);
+			HAL_Delay(10);
+			f_mount(NULL, "", 0);
 			HAL_TIM_Base_Stop_IT(&htim6);
+			HAL_DMA_Abort_IT(&hdma_adc1);
+			//HAL_ADC_Stop_DMA(&hadc1);
+			HAL_ADC_Stop(&hadc1);
 		}
 	}
   /* USER CODE END TIM6_DAC_IRQn 0 */
   HAL_TIM_IRQHandler(&htim6);
+  HAL_DAC_IRQHandler(&hdac);
   /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
 
   /* USER CODE END TIM6_DAC_IRQn 1 */

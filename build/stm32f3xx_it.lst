@@ -1,0 +1,1417 @@
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"stm32f3xx_it.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.NMI_Handler,"ax",%progbits
+  20              		.align	1
+  21              		.global	NMI_Handler
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	NMI_Handler:
+  27              	.LFB123:
+  28              		.file 1 "Core/Src/stm32f3xx_it.c"
+   1:Core/Src/stm32f3xx_it.c **** /* USER CODE BEGIN Header */
+   2:Core/Src/stm32f3xx_it.c **** /**
+   3:Core/Src/stm32f3xx_it.c ****   ******************************************************************************
+   4:Core/Src/stm32f3xx_it.c ****   * @file    stm32f3xx_it.c
+   5:Core/Src/stm32f3xx_it.c ****   * @brief   Interrupt Service Routines.
+   6:Core/Src/stm32f3xx_it.c ****   ******************************************************************************
+   7:Core/Src/stm32f3xx_it.c ****   * @attention
+   8:Core/Src/stm32f3xx_it.c ****   *
+   9:Core/Src/stm32f3xx_it.c ****   * Copyright (c) 2023 STMicroelectronics.
+  10:Core/Src/stm32f3xx_it.c ****   * All rights reserved.
+  11:Core/Src/stm32f3xx_it.c ****   *
+  12:Core/Src/stm32f3xx_it.c ****   * This software is licensed under terms that can be found in the LICENSE file
+  13:Core/Src/stm32f3xx_it.c ****   * in the root directory of this software component.
+  14:Core/Src/stm32f3xx_it.c ****   * If no LICENSE file comes with this software, it is provided AS-IS.
+  15:Core/Src/stm32f3xx_it.c ****   *
+  16:Core/Src/stm32f3xx_it.c ****   ******************************************************************************
+  17:Core/Src/stm32f3xx_it.c ****   */
+  18:Core/Src/stm32f3xx_it.c **** /* USER CODE END Header */
+  19:Core/Src/stm32f3xx_it.c **** 
+  20:Core/Src/stm32f3xx_it.c **** /* Includes ------------------------------------------------------------------*/
+  21:Core/Src/stm32f3xx_it.c **** #include "main.h"
+  22:Core/Src/stm32f3xx_it.c **** #include "stm32f3xx_it.h"
+  23:Core/Src/stm32f3xx_it.c **** /* Private includes ----------------------------------------------------------*/
+  24:Core/Src/stm32f3xx_it.c **** /* USER CODE BEGIN Includes */
+  25:Core/Src/stm32f3xx_it.c **** #include "fatfs.h"
+  26:Core/Src/stm32f3xx_it.c **** /* USER CODE END Includes */
+  27:Core/Src/stm32f3xx_it.c **** 
+  28:Core/Src/stm32f3xx_it.c **** /* Private typedef -----------------------------------------------------------*/
+  29:Core/Src/stm32f3xx_it.c **** /* USER CODE BEGIN TD */
+  30:Core/Src/stm32f3xx_it.c **** 
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 2
+
+
+  31:Core/Src/stm32f3xx_it.c **** /* USER CODE END TD */
+  32:Core/Src/stm32f3xx_it.c **** 
+  33:Core/Src/stm32f3xx_it.c **** /* Private define ------------------------------------------------------------*/
+  34:Core/Src/stm32f3xx_it.c **** /* USER CODE BEGIN PD */
+  35:Core/Src/stm32f3xx_it.c **** 
+  36:Core/Src/stm32f3xx_it.c **** /* USER CODE END PD */
+  37:Core/Src/stm32f3xx_it.c **** 
+  38:Core/Src/stm32f3xx_it.c **** /* Private macro -------------------------------------------------------------*/
+  39:Core/Src/stm32f3xx_it.c **** /* USER CODE BEGIN PM */
+  40:Core/Src/stm32f3xx_it.c **** 
+  41:Core/Src/stm32f3xx_it.c **** /* USER CODE END PM */
+  42:Core/Src/stm32f3xx_it.c **** 
+  43:Core/Src/stm32f3xx_it.c **** /* Private variables ---------------------------------------------------------*/
+  44:Core/Src/stm32f3xx_it.c **** /* USER CODE BEGIN PV */
+  45:Core/Src/stm32f3xx_it.c **** extern uint16_t Timer1, Timer2;
+  46:Core/Src/stm32f3xx_it.c **** extern FATFS       FatFs;                //Fatfs handle
+  47:Core/Src/stm32f3xx_it.c **** extern FIL         fil;                  //File handle
+  48:Core/Src/stm32f3xx_it.c **** extern DWORD       fileSize;
+  49:Core/Src/stm32f3xx_it.c **** extern FRESULT     fres;                 //Result after operations
+  50:Core/Src/stm32f3xx_it.c **** extern char        buf[100];
+  51:Core/Src/stm32f3xx_it.c **** 
+  52:Core/Src/stm32f3xx_it.c **** extern uint16_t tim17_counter;
+  53:Core/Src/stm32f3xx_it.c **** extern uint32_t adc_counter;
+  54:Core/Src/stm32f3xx_it.c **** /* USER CODE END PV */
+  55:Core/Src/stm32f3xx_it.c **** 
+  56:Core/Src/stm32f3xx_it.c **** /* Private function prototypes -----------------------------------------------*/
+  57:Core/Src/stm32f3xx_it.c **** /* USER CODE BEGIN PFP */
+  58:Core/Src/stm32f3xx_it.c **** 
+  59:Core/Src/stm32f3xx_it.c **** /* USER CODE END PFP */
+  60:Core/Src/stm32f3xx_it.c **** 
+  61:Core/Src/stm32f3xx_it.c **** /* Private user code ---------------------------------------------------------*/
+  62:Core/Src/stm32f3xx_it.c **** /* USER CODE BEGIN 0 */
+  63:Core/Src/stm32f3xx_it.c **** 
+  64:Core/Src/stm32f3xx_it.c **** /* USER CODE END 0 */
+  65:Core/Src/stm32f3xx_it.c **** 
+  66:Core/Src/stm32f3xx_it.c **** /* External variables --------------------------------------------------------*/
+  67:Core/Src/stm32f3xx_it.c **** extern DMA_HandleTypeDef hdma_adc1;
+  68:Core/Src/stm32f3xx_it.c **** extern DAC_HandleTypeDef hdac;
+  69:Core/Src/stm32f3xx_it.c **** extern DMA_HandleTypeDef hdma_tim17_ch1_up;
+  70:Core/Src/stm32f3xx_it.c **** extern TIM_HandleTypeDef htim6;
+  71:Core/Src/stm32f3xx_it.c **** extern TIM_HandleTypeDef htim17;
+  72:Core/Src/stm32f3xx_it.c **** /* USER CODE BEGIN EV */
+  73:Core/Src/stm32f3xx_it.c **** extern uint8_t buff_music[500];
+  74:Core/Src/stm32f3xx_it.c **** extern DWORD	old_fsize;
+  75:Core/Src/stm32f3xx_it.c **** extern  ADC_HandleTypeDef hadc1;
+  76:Core/Src/stm32f3xx_it.c **** /* USER CODE END EV */
+  77:Core/Src/stm32f3xx_it.c **** 
+  78:Core/Src/stm32f3xx_it.c **** /******************************************************************************/
+  79:Core/Src/stm32f3xx_it.c **** /*           Cortex-M4 Processor Interruption and Exception Handlers          */
+  80:Core/Src/stm32f3xx_it.c **** /******************************************************************************/
+  81:Core/Src/stm32f3xx_it.c **** /**
+  82:Core/Src/stm32f3xx_it.c ****   * @brief This function handles Non maskable interrupt.
+  83:Core/Src/stm32f3xx_it.c ****   */
+  84:Core/Src/stm32f3xx_it.c **** void NMI_Handler(void)
+  85:Core/Src/stm32f3xx_it.c **** {
+  29              		.loc 1 85 1 view -0
+  30              		.cfi_startproc
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 3
+
+
+  31              		@ Volatile: function does not return.
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  35              	.L2:
+  86:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
+  87:Core/Src/stm32f3xx_it.c **** 
+  88:Core/Src/stm32f3xx_it.c ****   /* USER CODE END NonMaskableInt_IRQn 0 */
+  89:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
+  90:Core/Src/stm32f3xx_it.c ****   while (1)
+  36              		.loc 1 90 3 discriminator 1 view .LVU1
+  91:Core/Src/stm32f3xx_it.c ****   {
+  92:Core/Src/stm32f3xx_it.c ****   }
+  37              		.loc 1 92 3 discriminator 1 view .LVU2
+  90:Core/Src/stm32f3xx_it.c ****   {
+  38              		.loc 1 90 9 discriminator 1 view .LVU3
+  39 0000 FEE7     		b	.L2
+  40              		.cfi_endproc
+  41              	.LFE123:
+  43              		.section	.text.HardFault_Handler,"ax",%progbits
+  44              		.align	1
+  45              		.global	HardFault_Handler
+  46              		.syntax unified
+  47              		.thumb
+  48              		.thumb_func
+  50              	HardFault_Handler:
+  51              	.LFB124:
+  93:Core/Src/stm32f3xx_it.c ****   /* USER CODE END NonMaskableInt_IRQn 1 */
+  94:Core/Src/stm32f3xx_it.c **** }
+  95:Core/Src/stm32f3xx_it.c **** 
+  96:Core/Src/stm32f3xx_it.c **** /**
+  97:Core/Src/stm32f3xx_it.c ****   * @brief This function handles Hard fault interrupt.
+  98:Core/Src/stm32f3xx_it.c ****   */
+  99:Core/Src/stm32f3xx_it.c **** void HardFault_Handler(void)
+ 100:Core/Src/stm32f3xx_it.c **** {
+  52              		.loc 1 100 1 view -0
+  53              		.cfi_startproc
+  54              		@ Volatile: function does not return.
+  55              		@ args = 0, pretend = 0, frame = 0
+  56              		@ frame_needed = 0, uses_anonymous_args = 0
+  57              		@ link register save eliminated.
+  58              	.L4:
+ 101:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN HardFault_IRQn 0 */
+ 102:Core/Src/stm32f3xx_it.c **** 
+ 103:Core/Src/stm32f3xx_it.c ****   /* USER CODE END HardFault_IRQn 0 */
+ 104:Core/Src/stm32f3xx_it.c ****   while (1)
+  59              		.loc 1 104 3 discriminator 1 view .LVU5
+ 105:Core/Src/stm32f3xx_it.c ****   {
+ 106:Core/Src/stm32f3xx_it.c ****     /* USER CODE BEGIN W1_HardFault_IRQn 0 */
+ 107:Core/Src/stm32f3xx_it.c ****     /* USER CODE END W1_HardFault_IRQn 0 */
+ 108:Core/Src/stm32f3xx_it.c ****   }
+  60              		.loc 1 108 3 discriminator 1 view .LVU6
+ 104:Core/Src/stm32f3xx_it.c ****   {
+  61              		.loc 1 104 9 discriminator 1 view .LVU7
+  62 0000 FEE7     		b	.L4
+  63              		.cfi_endproc
+  64              	.LFE124:
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 4
+
+
+  66              		.section	.text.MemManage_Handler,"ax",%progbits
+  67              		.align	1
+  68              		.global	MemManage_Handler
+  69              		.syntax unified
+  70              		.thumb
+  71              		.thumb_func
+  73              	MemManage_Handler:
+  74              	.LFB125:
+ 109:Core/Src/stm32f3xx_it.c **** }
+ 110:Core/Src/stm32f3xx_it.c **** 
+ 111:Core/Src/stm32f3xx_it.c **** /**
+ 112:Core/Src/stm32f3xx_it.c ****   * @brief This function handles Memory management fault.
+ 113:Core/Src/stm32f3xx_it.c ****   */
+ 114:Core/Src/stm32f3xx_it.c **** void MemManage_Handler(void)
+ 115:Core/Src/stm32f3xx_it.c **** {
+  75              		.loc 1 115 1 view -0
+  76              		.cfi_startproc
+  77              		@ Volatile: function does not return.
+  78              		@ args = 0, pretend = 0, frame = 0
+  79              		@ frame_needed = 0, uses_anonymous_args = 0
+  80              		@ link register save eliminated.
+  81              	.L6:
+ 116:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN MemoryManagement_IRQn 0 */
+ 117:Core/Src/stm32f3xx_it.c **** 
+ 118:Core/Src/stm32f3xx_it.c ****   /* USER CODE END MemoryManagement_IRQn 0 */
+ 119:Core/Src/stm32f3xx_it.c ****   while (1)
+  82              		.loc 1 119 3 discriminator 1 view .LVU9
+ 120:Core/Src/stm32f3xx_it.c ****   {
+ 121:Core/Src/stm32f3xx_it.c ****     /* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
+ 122:Core/Src/stm32f3xx_it.c ****     /* USER CODE END W1_MemoryManagement_IRQn 0 */
+ 123:Core/Src/stm32f3xx_it.c ****   }
+  83              		.loc 1 123 3 discriminator 1 view .LVU10
+ 119:Core/Src/stm32f3xx_it.c ****   {
+  84              		.loc 1 119 9 discriminator 1 view .LVU11
+  85 0000 FEE7     		b	.L6
+  86              		.cfi_endproc
+  87              	.LFE125:
+  89              		.section	.text.BusFault_Handler,"ax",%progbits
+  90              		.align	1
+  91              		.global	BusFault_Handler
+  92              		.syntax unified
+  93              		.thumb
+  94              		.thumb_func
+  96              	BusFault_Handler:
+  97              	.LFB126:
+ 124:Core/Src/stm32f3xx_it.c **** }
+ 125:Core/Src/stm32f3xx_it.c **** 
+ 126:Core/Src/stm32f3xx_it.c **** /**
+ 127:Core/Src/stm32f3xx_it.c ****   * @brief This function handles Pre-fetch fault, memory access fault.
+ 128:Core/Src/stm32f3xx_it.c ****   */
+ 129:Core/Src/stm32f3xx_it.c **** void BusFault_Handler(void)
+ 130:Core/Src/stm32f3xx_it.c **** {
+  98              		.loc 1 130 1 view -0
+  99              		.cfi_startproc
+ 100              		@ Volatile: function does not return.
+ 101              		@ args = 0, pretend = 0, frame = 0
+ 102              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 5
+
+
+ 103              		@ link register save eliminated.
+ 104              	.L8:
+ 131:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN BusFault_IRQn 0 */
+ 132:Core/Src/stm32f3xx_it.c **** 
+ 133:Core/Src/stm32f3xx_it.c ****   /* USER CODE END BusFault_IRQn 0 */
+ 134:Core/Src/stm32f3xx_it.c ****   while (1)
+ 105              		.loc 1 134 3 discriminator 1 view .LVU13
+ 135:Core/Src/stm32f3xx_it.c ****   {
+ 136:Core/Src/stm32f3xx_it.c ****     /* USER CODE BEGIN W1_BusFault_IRQn 0 */
+ 137:Core/Src/stm32f3xx_it.c ****     /* USER CODE END W1_BusFault_IRQn 0 */
+ 138:Core/Src/stm32f3xx_it.c ****   }
+ 106              		.loc 1 138 3 discriminator 1 view .LVU14
+ 134:Core/Src/stm32f3xx_it.c ****   {
+ 107              		.loc 1 134 9 discriminator 1 view .LVU15
+ 108 0000 FEE7     		b	.L8
+ 109              		.cfi_endproc
+ 110              	.LFE126:
+ 112              		.section	.text.UsageFault_Handler,"ax",%progbits
+ 113              		.align	1
+ 114              		.global	UsageFault_Handler
+ 115              		.syntax unified
+ 116              		.thumb
+ 117              		.thumb_func
+ 119              	UsageFault_Handler:
+ 120              	.LFB127:
+ 139:Core/Src/stm32f3xx_it.c **** }
+ 140:Core/Src/stm32f3xx_it.c **** 
+ 141:Core/Src/stm32f3xx_it.c **** /**
+ 142:Core/Src/stm32f3xx_it.c ****   * @brief This function handles Undefined instruction or illegal state.
+ 143:Core/Src/stm32f3xx_it.c ****   */
+ 144:Core/Src/stm32f3xx_it.c **** void UsageFault_Handler(void)
+ 145:Core/Src/stm32f3xx_it.c **** {
+ 121              		.loc 1 145 1 view -0
+ 122              		.cfi_startproc
+ 123              		@ Volatile: function does not return.
+ 124              		@ args = 0, pretend = 0, frame = 0
+ 125              		@ frame_needed = 0, uses_anonymous_args = 0
+ 126              		@ link register save eliminated.
+ 127              	.L10:
+ 146:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN UsageFault_IRQn 0 */
+ 147:Core/Src/stm32f3xx_it.c **** 
+ 148:Core/Src/stm32f3xx_it.c ****   /* USER CODE END UsageFault_IRQn 0 */
+ 149:Core/Src/stm32f3xx_it.c ****   while (1)
+ 128              		.loc 1 149 3 discriminator 1 view .LVU17
+ 150:Core/Src/stm32f3xx_it.c ****   {
+ 151:Core/Src/stm32f3xx_it.c ****     /* USER CODE BEGIN W1_UsageFault_IRQn 0 */
+ 152:Core/Src/stm32f3xx_it.c ****     /* USER CODE END W1_UsageFault_IRQn 0 */
+ 153:Core/Src/stm32f3xx_it.c ****   }
+ 129              		.loc 1 153 3 discriminator 1 view .LVU18
+ 149:Core/Src/stm32f3xx_it.c ****   {
+ 130              		.loc 1 149 9 discriminator 1 view .LVU19
+ 131 0000 FEE7     		b	.L10
+ 132              		.cfi_endproc
+ 133              	.LFE127:
+ 135              		.section	.text.SVC_Handler,"ax",%progbits
+ 136              		.align	1
+ 137              		.global	SVC_Handler
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 6
+
+
+ 138              		.syntax unified
+ 139              		.thumb
+ 140              		.thumb_func
+ 142              	SVC_Handler:
+ 143              	.LFB128:
+ 154:Core/Src/stm32f3xx_it.c **** }
+ 155:Core/Src/stm32f3xx_it.c **** 
+ 156:Core/Src/stm32f3xx_it.c **** /**
+ 157:Core/Src/stm32f3xx_it.c ****   * @brief This function handles System service call via SWI instruction.
+ 158:Core/Src/stm32f3xx_it.c ****   */
+ 159:Core/Src/stm32f3xx_it.c **** void SVC_Handler(void)
+ 160:Core/Src/stm32f3xx_it.c **** {
+ 144              		.loc 1 160 1 view -0
+ 145              		.cfi_startproc
+ 146              		@ args = 0, pretend = 0, frame = 0
+ 147              		@ frame_needed = 0, uses_anonymous_args = 0
+ 148              		@ link register save eliminated.
+ 161:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN SVCall_IRQn 0 */
+ 162:Core/Src/stm32f3xx_it.c **** 
+ 163:Core/Src/stm32f3xx_it.c ****   /* USER CODE END SVCall_IRQn 0 */
+ 164:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN SVCall_IRQn 1 */
+ 165:Core/Src/stm32f3xx_it.c **** 
+ 166:Core/Src/stm32f3xx_it.c ****   /* USER CODE END SVCall_IRQn 1 */
+ 167:Core/Src/stm32f3xx_it.c **** }
+ 149              		.loc 1 167 1 view .LVU21
+ 150 0000 7047     		bx	lr
+ 151              		.cfi_endproc
+ 152              	.LFE128:
+ 154              		.section	.text.DebugMon_Handler,"ax",%progbits
+ 155              		.align	1
+ 156              		.global	DebugMon_Handler
+ 157              		.syntax unified
+ 158              		.thumb
+ 159              		.thumb_func
+ 161              	DebugMon_Handler:
+ 162              	.LFB129:
+ 168:Core/Src/stm32f3xx_it.c **** 
+ 169:Core/Src/stm32f3xx_it.c **** /**
+ 170:Core/Src/stm32f3xx_it.c ****   * @brief This function handles Debug monitor.
+ 171:Core/Src/stm32f3xx_it.c ****   */
+ 172:Core/Src/stm32f3xx_it.c **** void DebugMon_Handler(void)
+ 173:Core/Src/stm32f3xx_it.c **** {
+ 163              		.loc 1 173 1 view -0
+ 164              		.cfi_startproc
+ 165              		@ args = 0, pretend = 0, frame = 0
+ 166              		@ frame_needed = 0, uses_anonymous_args = 0
+ 167              		@ link register save eliminated.
+ 174:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN DebugMonitor_IRQn 0 */
+ 175:Core/Src/stm32f3xx_it.c **** 
+ 176:Core/Src/stm32f3xx_it.c ****   /* USER CODE END DebugMonitor_IRQn 0 */
+ 177:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN DebugMonitor_IRQn 1 */
+ 178:Core/Src/stm32f3xx_it.c **** 
+ 179:Core/Src/stm32f3xx_it.c ****   /* USER CODE END DebugMonitor_IRQn 1 */
+ 180:Core/Src/stm32f3xx_it.c **** }
+ 168              		.loc 1 180 1 view .LVU23
+ 169 0000 7047     		bx	lr
+ 170              		.cfi_endproc
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 7
+
+
+ 171              	.LFE129:
+ 173              		.section	.text.PendSV_Handler,"ax",%progbits
+ 174              		.align	1
+ 175              		.global	PendSV_Handler
+ 176              		.syntax unified
+ 177              		.thumb
+ 178              		.thumb_func
+ 180              	PendSV_Handler:
+ 181              	.LFB130:
+ 181:Core/Src/stm32f3xx_it.c **** 
+ 182:Core/Src/stm32f3xx_it.c **** /**
+ 183:Core/Src/stm32f3xx_it.c ****   * @brief This function handles Pendable request for system service.
+ 184:Core/Src/stm32f3xx_it.c ****   */
+ 185:Core/Src/stm32f3xx_it.c **** void PendSV_Handler(void)
+ 186:Core/Src/stm32f3xx_it.c **** {
+ 182              		.loc 1 186 1 view -0
+ 183              		.cfi_startproc
+ 184              		@ args = 0, pretend = 0, frame = 0
+ 185              		@ frame_needed = 0, uses_anonymous_args = 0
+ 186              		@ link register save eliminated.
+ 187:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN PendSV_IRQn 0 */
+ 188:Core/Src/stm32f3xx_it.c **** 
+ 189:Core/Src/stm32f3xx_it.c ****   /* USER CODE END PendSV_IRQn 0 */
+ 190:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN PendSV_IRQn 1 */
+ 191:Core/Src/stm32f3xx_it.c **** 
+ 192:Core/Src/stm32f3xx_it.c ****   /* USER CODE END PendSV_IRQn 1 */
+ 193:Core/Src/stm32f3xx_it.c **** }
+ 187              		.loc 1 193 1 view .LVU25
+ 188 0000 7047     		bx	lr
+ 189              		.cfi_endproc
+ 190              	.LFE130:
+ 192              		.section	.text.SysTick_Handler,"ax",%progbits
+ 193              		.align	1
+ 194              		.global	SysTick_Handler
+ 195              		.syntax unified
+ 196              		.thumb
+ 197              		.thumb_func
+ 199              	SysTick_Handler:
+ 200              	.LFB131:
+ 194:Core/Src/stm32f3xx_it.c **** 
+ 195:Core/Src/stm32f3xx_it.c **** /**
+ 196:Core/Src/stm32f3xx_it.c ****   * @brief This function handles System tick timer.
+ 197:Core/Src/stm32f3xx_it.c ****   */
+ 198:Core/Src/stm32f3xx_it.c **** void SysTick_Handler(void)
+ 199:Core/Src/stm32f3xx_it.c **** {
+ 201              		.loc 1 199 1 view -0
+ 202              		.cfi_startproc
+ 203              		@ args = 0, pretend = 0, frame = 0
+ 204              		@ frame_needed = 0, uses_anonymous_args = 0
+ 205 0000 08B5     		push	{r3, lr}
+ 206              	.LCFI0:
+ 207              		.cfi_def_cfa_offset 8
+ 208              		.cfi_offset 3, -8
+ 209              		.cfi_offset 14, -4
+ 200:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN SysTick_IRQn 0 */
+ 201:Core/Src/stm32f3xx_it.c **** 	if(Timer1 > 0)
+ 210              		.loc 1 201 2 view .LVU27
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 8
+
+
+ 211              		.loc 1 201 12 is_stmt 0 view .LVU28
+ 212 0002 074B     		ldr	r3, .L18
+ 213 0004 1B88     		ldrh	r3, [r3]
+ 214              		.loc 1 201 4 view .LVU29
+ 215 0006 13B1     		cbz	r3, .L15
+ 202:Core/Src/stm32f3xx_it.c **** 	  Timer1--;
+ 216              		.loc 1 202 4 is_stmt 1 view .LVU30
+ 217              		.loc 1 202 10 is_stmt 0 view .LVU31
+ 218 0008 013B     		subs	r3, r3, #1
+ 219 000a 054A     		ldr	r2, .L18
+ 220 000c 1380     		strh	r3, [r2]	@ movhi
+ 221              	.L15:
+ 203:Core/Src/stm32f3xx_it.c **** 	if(Timer2 > 0)
+ 222              		.loc 1 203 2 is_stmt 1 view .LVU32
+ 223              		.loc 1 203 12 is_stmt 0 view .LVU33
+ 224 000e 054B     		ldr	r3, .L18+4
+ 225 0010 1B88     		ldrh	r3, [r3]
+ 226              		.loc 1 203 4 view .LVU34
+ 227 0012 13B1     		cbz	r3, .L16
+ 204:Core/Src/stm32f3xx_it.c **** 	  Timer2--;
+ 228              		.loc 1 204 4 is_stmt 1 view .LVU35
+ 229              		.loc 1 204 10 is_stmt 0 view .LVU36
+ 230 0014 013B     		subs	r3, r3, #1
+ 231 0016 034A     		ldr	r2, .L18+4
+ 232 0018 1380     		strh	r3, [r2]	@ movhi
+ 233              	.L16:
+ 205:Core/Src/stm32f3xx_it.c ****   /* USER CODE END SysTick_IRQn 0 */
+ 206:Core/Src/stm32f3xx_it.c ****   HAL_IncTick();
+ 234              		.loc 1 206 3 is_stmt 1 view .LVU37
+ 235 001a FFF7FEFF 		bl	HAL_IncTick
+ 236              	.LVL0:
+ 207:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN SysTick_IRQn 1 */
+ 208:Core/Src/stm32f3xx_it.c **** 
+ 209:Core/Src/stm32f3xx_it.c ****   /* USER CODE END SysTick_IRQn 1 */
+ 210:Core/Src/stm32f3xx_it.c **** }
+ 237              		.loc 1 210 1 is_stmt 0 view .LVU38
+ 238 001e 08BD     		pop	{r3, pc}
+ 239              	.L19:
+ 240              		.align	2
+ 241              	.L18:
+ 242 0020 00000000 		.word	Timer1
+ 243 0024 00000000 		.word	Timer2
+ 244              		.cfi_endproc
+ 245              	.LFE131:
+ 247              		.section	.rodata.DMA1_Channel1_IRQHandler.str1.4,"aMS",%progbits,1
+ 248              		.align	2
+ 249              	.LC0:
+ 250 0000 5F20665F 		.ascii	"_ f_size(&fil) == %d \015\012\000"
+ 250      73697A65 
+ 250      28266669 
+ 250      6C29203D 
+ 250      3D202564 
+ 251              		.align	2
+ 252              	.LC1:
+ 253 0018 20202020 		.ascii	"    %d    \000"
+ 253      25642020 
+ 253      202000
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 9
+
+
+ 254 0023 00       		.align	2
+ 255              	.LC2:
+ 256 0024 44617461 		.ascii	"Data written to file: \015\000"
+ 256      20777269 
+ 256      7474656E 
+ 256      20746F20 
+ 256      66696C65 
+ 257              		.align	2
+ 258              	.LC3:
+ 259 003c 00       		.ascii	"\000"
+ 260              		.section	.text.DMA1_Channel1_IRQHandler,"ax",%progbits
+ 261              		.align	1
+ 262              		.global	DMA1_Channel1_IRQHandler
+ 263              		.syntax unified
+ 264              		.thumb
+ 265              		.thumb_func
+ 267              	DMA1_Channel1_IRQHandler:
+ 268              	.LFB132:
+ 211:Core/Src/stm32f3xx_it.c **** 
+ 212:Core/Src/stm32f3xx_it.c **** /******************************************************************************/
+ 213:Core/Src/stm32f3xx_it.c **** /* STM32F3xx Peripheral Interrupt Handlers                                    */
+ 214:Core/Src/stm32f3xx_it.c **** /* Add here the Interrupt Handlers for the used peripherals.                  */
+ 215:Core/Src/stm32f3xx_it.c **** /* For the available peripheral interrupt handler names,                      */
+ 216:Core/Src/stm32f3xx_it.c **** /* please refer to the startup file (startup_stm32f3xx.s).                    */
+ 217:Core/Src/stm32f3xx_it.c **** /******************************************************************************/
+ 218:Core/Src/stm32f3xx_it.c **** 
+ 219:Core/Src/stm32f3xx_it.c **** /**
+ 220:Core/Src/stm32f3xx_it.c ****   * @brief This function handles DMA1 channel1 global interrupt.
+ 221:Core/Src/stm32f3xx_it.c ****   */
+ 222:Core/Src/stm32f3xx_it.c **** void DMA1_Channel1_IRQHandler(void)
+ 223:Core/Src/stm32f3xx_it.c **** {
+ 269              		.loc 1 223 1 is_stmt 1 view -0
+ 270              		.cfi_startproc
+ 271              		@ args = 0, pretend = 0, frame = 8
+ 272              		@ frame_needed = 0, uses_anonymous_args = 0
+ 273 0000 30B5     		push	{r4, r5, lr}
+ 274              	.LCFI1:
+ 275              		.cfi_def_cfa_offset 12
+ 276              		.cfi_offset 4, -12
+ 277              		.cfi_offset 5, -8
+ 278              		.cfi_offset 14, -4
+ 279 0002 83B0     		sub	sp, sp, #12
+ 280              	.LCFI2:
+ 281              		.cfi_def_cfa_offset 24
+ 224:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
+ 225:Core/Src/stm32f3xx_it.c **** 	if(DMA1->ISR & DMA_ISR_TCIF1 == DMA_ISR_TCIF1)
+ 282              		.loc 1 225 2 view .LVU40
+ 283              		.loc 1 225 9 is_stmt 0 view .LVU41
+ 284 0004 2D4B     		ldr	r3, .L27
+ 285 0006 1B68     		ldr	r3, [r3]
+ 286              		.loc 1 225 4 view .LVU42
+ 287 0008 13F0010F 		tst	r3, #1
+ 288 000c 32D0     		beq	.L21
+ 226:Core/Src/stm32f3xx_it.c **** 	{
+ 227:Core/Src/stm32f3xx_it.c **** 		DMA1->IFCR |= DMA_IFCR_CTCIF1;
+ 289              		.loc 1 227 3 is_stmt 1 view .LVU43
+ 290              		.loc 1 227 14 is_stmt 0 view .LVU44
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 10
+
+
+ 291 000e 2B4A     		ldr	r2, .L27
+ 292 0010 5368     		ldr	r3, [r2, #4]
+ 293 0012 43F00203 		orr	r3, r3, #2
+ 294 0016 5360     		str	r3, [r2, #4]
+ 228:Core/Src/stm32f3xx_it.c **** 		fil.fsize = old_fsize;
+ 295              		.loc 1 228 3 is_stmt 1 view .LVU45
+ 296              		.loc 1 228 13 is_stmt 0 view .LVU46
+ 297 0018 294B     		ldr	r3, .L27+4
+ 298 001a 1968     		ldr	r1, [r3]
+ 299 001c 294B     		ldr	r3, .L27+8
+ 300 001e D960     		str	r1, [r3, #12]
+ 229:Core/Src/stm32f3xx_it.c **** 		if (fres == FR_OK) {
+ 301              		.loc 1 229 3 is_stmt 1 view .LVU47
+ 302              		.loc 1 229 12 is_stmt 0 view .LVU48
+ 303 0020 294B     		ldr	r3, .L27+12
+ 304 0022 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 305              		.loc 1 229 6 view .LVU49
+ 306 0024 5BB3     		cbz	r3, .L26
+ 307              	.L22:
+ 230:Core/Src/stm32f3xx_it.c **** 			UINT bytesWritten;
+ 231:Core/Src/stm32f3xx_it.c **** 			// Move the file pointer to the end of the file
+ 232:Core/Src/stm32f3xx_it.c **** 			f_lseek(&fil, f_size(&fil) /*sizeof(fil)*/);
+ 233:Core/Src/stm32f3xx_it.c **** 			DWORD size_of_fil;
+ 234:Core/Src/stm32f3xx_it.c **** 			size_of_fil = f_size(&fil);
+ 235:Core/Src/stm32f3xx_it.c **** 			printf("_ f_size(&fil) == %d \r\n", size_of_fil);
+ 236:Core/Src/stm32f3xx_it.c **** 			printf("    %d    ", buff_music[10]);
+ 237:Core/Src/stm32f3xx_it.c **** 			// Write data to the file
+ 238:Core/Src/stm32f3xx_it.c **** 			fres = f_write(&fil, buff_music, sizeof(buff_music), &bytesWritten);
+ 239:Core/Src/stm32f3xx_it.c **** 			if (fres == FR_OK) {
+ 240:Core/Src/stm32f3xx_it.c **** 				// Data written successfully
+ 241:Core/Src/stm32f3xx_it.c **** 				//f_close(&fil);  // Close the file
+ 242:Core/Src/stm32f3xx_it.c **** 				printf("Data written to file: \r\n");
+ 243:Core/Src/stm32f3xx_it.c **** 			} else {
+ 244:Core/Src/stm32f3xx_it.c **** 				// Error occurred while writing data
+ 245:Core/Src/stm32f3xx_it.c **** 				//f_close(&fil);  // Close the file
+ 246:Core/Src/stm32f3xx_it.c **** 				//printf("Error writing data to file: data_file.txt \r\n");
+ 247:Core/Src/stm32f3xx_it.c **** 			}
+ 248:Core/Src/stm32f3xx_it.c **** 		} else {
+ 249:Core/Src/stm32f3xx_it.c **** 			// Error occurred while opening the file
+ 250:Core/Src/stm32f3xx_it.c **** 			//printf("Error opening file: data_file.txt \r\n");
+ 251:Core/Src/stm32f3xx_it.c **** 		}
+ 308              		.loc 1 251 3 is_stmt 1 view .LVU50
+ 252:Core/Src/stm32f3xx_it.c **** 	  old_fsize = fil.fsize;
+ 309              		.loc 1 252 4 view .LVU51
+ 310              		.loc 1 252 19 is_stmt 0 view .LVU52
+ 311 0026 274B     		ldr	r3, .L27+8
+ 312 0028 DA68     		ldr	r2, [r3, #12]
+ 313              		.loc 1 252 14 view .LVU53
+ 314 002a 254B     		ldr	r3, .L27+4
+ 315 002c 1A60     		str	r2, [r3]
+ 253:Core/Src/stm32f3xx_it.c **** 	  adc_counter++;
+ 316              		.loc 1 253 4 is_stmt 1 view .LVU54
+ 317              		.loc 1 253 15 is_stmt 0 view .LVU55
+ 318 002e 274A     		ldr	r2, .L27+16
+ 319 0030 1368     		ldr	r3, [r2]
+ 320 0032 0133     		adds	r3, r3, #1
+ 321 0034 1360     		str	r3, [r2]
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 11
+
+
+ 254:Core/Src/stm32f3xx_it.c **** 		if(((GPIOC->IDR & GPIO_ODR_10) == 0) || !HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_10))
+ 322              		.loc 1 254 3 is_stmt 1 view .LVU56
+ 323              		.loc 1 254 13 is_stmt 0 view .LVU57
+ 324 0036 264B     		ldr	r3, .L27+20
+ 325 0038 1B69     		ldr	r3, [r3, #16]
+ 326              		.loc 1 254 5 view .LVU58
+ 327 003a 13F4806F 		tst	r3, #1024
+ 328 003e 05D0     		beq	.L24
+ 329              		.loc 1 254 44 discriminator 1 view .LVU59
+ 330 0040 4FF48061 		mov	r1, #1024
+ 331 0044 2248     		ldr	r0, .L27+20
+ 332 0046 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 333              	.LVL1:
+ 334              		.loc 1 254 40 discriminator 1 view .LVU60
+ 335 004a 98B9     		cbnz	r0, .L21
+ 336              	.L24:
+ 255:Core/Src/stm32f3xx_it.c **** 		{
+ 256:Core/Src/stm32f3xx_it.c **** 			f_close(&fil);
+ 337              		.loc 1 256 4 is_stmt 1 view .LVU61
+ 338 004c 2148     		ldr	r0, .L27+24
+ 339 004e FFF7FEFF 		bl	f_close
+ 340              	.LVL2:
+ 257:Core/Src/stm32f3xx_it.c **** 			HAL_Delay(10);
+ 341              		.loc 1 257 4 view .LVU62
+ 342 0052 0A20     		movs	r0, #10
+ 343 0054 FFF7FEFF 		bl	HAL_Delay
+ 344              	.LVL3:
+ 258:Core/Src/stm32f3xx_it.c **** 			f_mount(NULL, "", 0);
+ 345              		.loc 1 258 4 view .LVU63
+ 346 0058 0022     		movs	r2, #0
+ 347 005a 1F49     		ldr	r1, .L27+28
+ 348 005c 1046     		mov	r0, r2
+ 349 005e FFF7FEFF 		bl	f_mount
+ 350              	.LVL4:
+ 259:Core/Src/stm32f3xx_it.c **** 			HAL_TIM_Base_Stop_IT(&htim6);
+ 351              		.loc 1 259 4 view .LVU64
+ 352 0062 1E48     		ldr	r0, .L27+32
+ 353 0064 FFF7FEFF 		bl	HAL_TIM_Base_Stop_IT
+ 354              	.LVL5:
+ 260:Core/Src/stm32f3xx_it.c **** 			HAL_DMA_Abort_IT(&hdma_adc1);
+ 355              		.loc 1 260 4 view .LVU65
+ 356 0068 1D48     		ldr	r0, .L27+36
+ 357 006a FFF7FEFF 		bl	HAL_DMA_Abort_IT
+ 358              	.LVL6:
+ 261:Core/Src/stm32f3xx_it.c **** 			HAL_ADC_Stop(&hadc1);
+ 359              		.loc 1 261 4 view .LVU66
+ 360 006e 1D48     		ldr	r0, .L27+40
+ 361 0070 FFF7FEFF 		bl	HAL_ADC_Stop
+ 362              	.LVL7:
+ 363              	.L21:
+ 262:Core/Src/stm32f3xx_it.c **** 		}
+ 263:Core/Src/stm32f3xx_it.c **** 
+ 264:Core/Src/stm32f3xx_it.c **** 	}
+ 265:Core/Src/stm32f3xx_it.c ****   /* USER CODE END DMA1_Channel1_IRQn 0 */
+ 266:Core/Src/stm32f3xx_it.c ****   HAL_DMA_IRQHandler(&hdma_adc1);
+ 364              		.loc 1 266 3 view .LVU67
+ 365 0074 1A48     		ldr	r0, .L27+36
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 12
+
+
+ 366 0076 FFF7FEFF 		bl	HAL_DMA_IRQHandler
+ 367              	.LVL8:
+ 267:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
+ 268:Core/Src/stm32f3xx_it.c **** 
+ 269:Core/Src/stm32f3xx_it.c ****   /* USER CODE END DMA1_Channel1_IRQn 1 */
+ 270:Core/Src/stm32f3xx_it.c **** }
+ 368              		.loc 1 270 1 is_stmt 0 view .LVU68
+ 369 007a 03B0     		add	sp, sp, #12
+ 370              	.LCFI3:
+ 371              		.cfi_remember_state
+ 372              		.cfi_def_cfa_offset 12
+ 373              		@ sp needed
+ 374 007c 30BD     		pop	{r4, r5, pc}
+ 375              	.L26:
+ 376              	.LCFI4:
+ 377              		.cfi_restore_state
+ 378              	.LBB2:
+ 230:Core/Src/stm32f3xx_it.c **** 			// Move the file pointer to the end of the file
+ 379              		.loc 1 230 4 is_stmt 1 view .LVU69
+ 232:Core/Src/stm32f3xx_it.c **** 			DWORD size_of_fil;
+ 380              		.loc 1 232 4 view .LVU70
+ 381 007e 154C     		ldr	r4, .L27+24
+ 382 0080 2046     		mov	r0, r4
+ 383 0082 FFF7FEFF 		bl	f_lseek
+ 384              	.LVL9:
+ 233:Core/Src/stm32f3xx_it.c **** 			size_of_fil = f_size(&fil);
+ 385              		.loc 1 233 4 view .LVU71
+ 234:Core/Src/stm32f3xx_it.c **** 			printf("_ f_size(&fil) == %d \r\n", size_of_fil);
+ 386              		.loc 1 234 4 view .LVU72
+ 234:Core/Src/stm32f3xx_it.c **** 			printf("_ f_size(&fil) == %d \r\n", size_of_fil);
+ 387              		.loc 1 234 16 is_stmt 0 view .LVU73
+ 388 0086 04F58053 		add	r3, r4, #4096
+ 389              	.LVL10:
+ 235:Core/Src/stm32f3xx_it.c **** 			printf("    %d    ", buff_music[10]);
+ 390              		.loc 1 235 4 is_stmt 1 view .LVU74
+ 391 008a D968     		ldr	r1, [r3, #12]
+ 392 008c 1648     		ldr	r0, .L27+44
+ 393 008e FFF7FEFF 		bl	printf
+ 394              	.LVL11:
+ 236:Core/Src/stm32f3xx_it.c **** 			// Write data to the file
+ 395              		.loc 1 236 4 view .LVU75
+ 236:Core/Src/stm32f3xx_it.c **** 			// Write data to the file
+ 396              		.loc 1 236 35 is_stmt 0 view .LVU76
+ 397 0092 164D     		ldr	r5, .L27+48
+ 236:Core/Src/stm32f3xx_it.c **** 			// Write data to the file
+ 398              		.loc 1 236 4 view .LVU77
+ 399 0094 A97A     		ldrb	r1, [r5, #10]	@ zero_extendqisi2
+ 400 0096 1648     		ldr	r0, .L27+52
+ 401 0098 FFF7FEFF 		bl	printf
+ 402              	.LVL12:
+ 238:Core/Src/stm32f3xx_it.c **** 			if (fres == FR_OK) {
+ 403              		.loc 1 238 4 is_stmt 1 view .LVU78
+ 238:Core/Src/stm32f3xx_it.c **** 			if (fres == FR_OK) {
+ 404              		.loc 1 238 11 is_stmt 0 view .LVU79
+ 405 009c 01AB     		add	r3, sp, #4
+ 406 009e 4FF4FA72 		mov	r2, #500
+ 407 00a2 2946     		mov	r1, r5
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 13
+
+
+ 408 00a4 2046     		mov	r0, r4
+ 409 00a6 FFF7FEFF 		bl	f_write
+ 410              	.LVL13:
+ 238:Core/Src/stm32f3xx_it.c **** 			if (fres == FR_OK) {
+ 411              		.loc 1 238 9 view .LVU80
+ 412 00aa 074B     		ldr	r3, .L27+12
+ 413 00ac 1870     		strb	r0, [r3]
+ 239:Core/Src/stm32f3xx_it.c **** 				// Data written successfully
+ 414              		.loc 1 239 4 is_stmt 1 view .LVU81
+ 239:Core/Src/stm32f3xx_it.c **** 				// Data written successfully
+ 415              		.loc 1 239 7 is_stmt 0 view .LVU82
+ 416 00ae 0028     		cmp	r0, #0
+ 417 00b0 B9D1     		bne	.L22
+ 242:Core/Src/stm32f3xx_it.c **** 			} else {
+ 418              		.loc 1 242 5 is_stmt 1 view .LVU83
+ 419 00b2 1048     		ldr	r0, .L27+56
+ 420 00b4 FFF7FEFF 		bl	puts
+ 421              	.LVL14:
+ 247:Core/Src/stm32f3xx_it.c **** 		} else {
+ 422              		.loc 1 247 4 view .LVU84
+ 423 00b8 B5E7     		b	.L22
+ 424              	.L28:
+ 425 00ba 00BF     		.align	2
+ 426              	.L27:
+ 427 00bc 00000240 		.word	1073872896
+ 428 00c0 00000000 		.word	old_fsize
+ 429 00c4 00100000 		.word	fil+4096
+ 430 00c8 00000000 		.word	fres
+ 431 00cc 00000000 		.word	adc_counter
+ 432 00d0 00080048 		.word	1207961600
+ 433 00d4 00000000 		.word	fil
+ 434 00d8 3C000000 		.word	.LC3
+ 435 00dc 00000000 		.word	htim6
+ 436 00e0 00000000 		.word	hdma_adc1
+ 437 00e4 00000000 		.word	hadc1
+ 438 00e8 00000000 		.word	.LC0
+ 439 00ec 00000000 		.word	buff_music
+ 440 00f0 18000000 		.word	.LC1
+ 441 00f4 24000000 		.word	.LC2
+ 442              	.LBE2:
+ 443              		.cfi_endproc
+ 444              	.LFE132:
+ 446              		.section	.text.DMA1_Channel7_IRQHandler,"ax",%progbits
+ 447              		.align	1
+ 448              		.global	DMA1_Channel7_IRQHandler
+ 449              		.syntax unified
+ 450              		.thumb
+ 451              		.thumb_func
+ 453              	DMA1_Channel7_IRQHandler:
+ 454              	.LFB133:
+ 271:Core/Src/stm32f3xx_it.c **** 
+ 272:Core/Src/stm32f3xx_it.c **** /**
+ 273:Core/Src/stm32f3xx_it.c ****   * @brief This function handles DMA1 channel7 global interrupt.
+ 274:Core/Src/stm32f3xx_it.c ****   */
+ 275:Core/Src/stm32f3xx_it.c **** void DMA1_Channel7_IRQHandler(void)
+ 276:Core/Src/stm32f3xx_it.c **** {
+ 455              		.loc 1 276 1 view -0
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 14
+
+
+ 456              		.cfi_startproc
+ 457              		@ args = 0, pretend = 0, frame = 8
+ 458              		@ frame_needed = 0, uses_anonymous_args = 0
+ 459 0000 70B5     		push	{r4, r5, r6, lr}
+ 460              	.LCFI5:
+ 461              		.cfi_def_cfa_offset 16
+ 462              		.cfi_offset 4, -16
+ 463              		.cfi_offset 5, -12
+ 464              		.cfi_offset 6, -8
+ 465              		.cfi_offset 14, -4
+ 466 0002 82B0     		sub	sp, sp, #8
+ 467              	.LCFI6:
+ 468              		.cfi_def_cfa_offset 24
+ 277:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN DMA1_Channel7_IRQn 0 */
+ 278:Core/Src/stm32f3xx_it.c **** 	if(DMA1->ISR & DMA_ISR_TCIF7 == DMA_ISR_TCIF7)
+ 469              		.loc 1 278 2 view .LVU86
+ 470              		.loc 1 278 9 is_stmt 0 view .LVU87
+ 471 0004 174B     		ldr	r3, .L34
+ 472 0006 1B68     		ldr	r3, [r3]
+ 473              		.loc 1 278 4 view .LVU88
+ 474 0008 13F0010F 		tst	r3, #1
+ 475 000c 04D1     		bne	.L33
+ 476              	.L30:
+ 279:Core/Src/stm32f3xx_it.c **** 	{
+ 280:Core/Src/stm32f3xx_it.c **** 		DMA1->IFCR |= DMA_IFCR_CTCIF7;
+ 281:Core/Src/stm32f3xx_it.c **** 		HAL_TIM_PWM_Stop_DMA(&htim17, TIM_CHANNEL_1);
+ 282:Core/Src/stm32f3xx_it.c **** 		UINT bytesRead;
+ 283:Core/Src/stm32f3xx_it.c **** 		fres = f_read(&fil, buff_music, sizeof(buff_music), &bytesRead);
+ 284:Core/Src/stm32f3xx_it.c **** 		HAL_TIM_PWM_Start_DMA(&htim17, TIM_CHANNEL_1, (uint32_t*)buff_music, sizeof(buff_music));
+ 285:Core/Src/stm32f3xx_it.c **** 
+ 286:Core/Src/stm32f3xx_it.c **** 		if(fres != FR_OK)
+ 287:Core/Src/stm32f3xx_it.c **** 		{
+ 288:Core/Src/stm32f3xx_it.c **** 			HAL_TIM_PWM_Stop_DMA(&htim17, TIM_CHANNEL_1);
+ 289:Core/Src/stm32f3xx_it.c **** 			stop_play_music(&fil);
+ 290:Core/Src/stm32f3xx_it.c **** 		}
+ 291:Core/Src/stm32f3xx_it.c **** 	}
+ 292:Core/Src/stm32f3xx_it.c ****   /* USER CODE END DMA1_Channel7_IRQn 0 */
+ 293:Core/Src/stm32f3xx_it.c ****   HAL_DMA_IRQHandler(&hdma_tim17_ch1_up);
+ 477              		.loc 1 293 3 is_stmt 1 view .LVU89
+ 478 000e 1648     		ldr	r0, .L34+4
+ 479 0010 FFF7FEFF 		bl	HAL_DMA_IRQHandler
+ 480              	.LVL15:
+ 294:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN DMA1_Channel7_IRQn 1 */
+ 295:Core/Src/stm32f3xx_it.c **** 
+ 296:Core/Src/stm32f3xx_it.c ****   /* USER CODE END DMA1_Channel7_IRQn 1 */
+ 297:Core/Src/stm32f3xx_it.c **** }
+ 481              		.loc 1 297 1 is_stmt 0 view .LVU90
+ 482 0014 02B0     		add	sp, sp, #8
+ 483              	.LCFI7:
+ 484              		.cfi_remember_state
+ 485              		.cfi_def_cfa_offset 16
+ 486              		@ sp needed
+ 487 0016 70BD     		pop	{r4, r5, r6, pc}
+ 488              	.L33:
+ 489              	.LCFI8:
+ 490              		.cfi_restore_state
+ 491              	.LBB3:
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 15
+
+
+ 280:Core/Src/stm32f3xx_it.c **** 		HAL_TIM_PWM_Stop_DMA(&htim17, TIM_CHANNEL_1);
+ 492              		.loc 1 280 3 is_stmt 1 view .LVU91
+ 280:Core/Src/stm32f3xx_it.c **** 		HAL_TIM_PWM_Stop_DMA(&htim17, TIM_CHANNEL_1);
+ 493              		.loc 1 280 14 is_stmt 0 view .LVU92
+ 494 0018 124A     		ldr	r2, .L34
+ 495 001a 5368     		ldr	r3, [r2, #4]
+ 496 001c 43F00073 		orr	r3, r3, #33554432
+ 497 0020 5360     		str	r3, [r2, #4]
+ 281:Core/Src/stm32f3xx_it.c **** 		UINT bytesRead;
+ 498              		.loc 1 281 3 is_stmt 1 view .LVU93
+ 499 0022 124D     		ldr	r5, .L34+8
+ 500 0024 0021     		movs	r1, #0
+ 501 0026 2846     		mov	r0, r5
+ 502 0028 FFF7FEFF 		bl	HAL_TIM_PWM_Stop_DMA
+ 503              	.LVL16:
+ 282:Core/Src/stm32f3xx_it.c **** 		fres = f_read(&fil, buff_music, sizeof(buff_music), &bytesRead);
+ 504              		.loc 1 282 3 view .LVU94
+ 283:Core/Src/stm32f3xx_it.c **** 		HAL_TIM_PWM_Start_DMA(&htim17, TIM_CHANNEL_1, (uint32_t*)buff_music, sizeof(buff_music));
+ 505              		.loc 1 283 3 view .LVU95
+ 283:Core/Src/stm32f3xx_it.c **** 		HAL_TIM_PWM_Start_DMA(&htim17, TIM_CHANNEL_1, (uint32_t*)buff_music, sizeof(buff_music));
+ 506              		.loc 1 283 10 is_stmt 0 view .LVU96
+ 507 002c 104E     		ldr	r6, .L34+12
+ 508 002e 01AB     		add	r3, sp, #4
+ 509 0030 4FF4FA72 		mov	r2, #500
+ 510 0034 3146     		mov	r1, r6
+ 511 0036 0F48     		ldr	r0, .L34+16
+ 512 0038 FFF7FEFF 		bl	f_read
+ 513              	.LVL17:
+ 283:Core/Src/stm32f3xx_it.c **** 		HAL_TIM_PWM_Start_DMA(&htim17, TIM_CHANNEL_1, (uint32_t*)buff_music, sizeof(buff_music));
+ 514              		.loc 1 283 8 view .LVU97
+ 515 003c 0E4C     		ldr	r4, .L34+20
+ 516 003e 2070     		strb	r0, [r4]
+ 284:Core/Src/stm32f3xx_it.c **** 
+ 517              		.loc 1 284 3 is_stmt 1 view .LVU98
+ 518 0040 4FF4FA73 		mov	r3, #500
+ 519 0044 3246     		mov	r2, r6
+ 520 0046 0021     		movs	r1, #0
+ 521 0048 2846     		mov	r0, r5
+ 522 004a FFF7FEFF 		bl	HAL_TIM_PWM_Start_DMA
+ 523              	.LVL18:
+ 286:Core/Src/stm32f3xx_it.c **** 		{
+ 524              		.loc 1 286 3 view .LVU99
+ 286:Core/Src/stm32f3xx_it.c **** 		{
+ 525              		.loc 1 286 11 is_stmt 0 view .LVU100
+ 526 004e 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 286:Core/Src/stm32f3xx_it.c **** 		{
+ 527              		.loc 1 286 5 view .LVU101
+ 528 0050 002B     		cmp	r3, #0
+ 529 0052 DCD0     		beq	.L30
+ 530              	.LBB4:
+ 288:Core/Src/stm32f3xx_it.c **** 			stop_play_music(&fil);
+ 531              		.loc 1 288 4 is_stmt 1 view .LVU102
+ 532 0054 0021     		movs	r1, #0
+ 533 0056 2846     		mov	r0, r5
+ 534 0058 FFF7FEFF 		bl	HAL_TIM_PWM_Stop_DMA
+ 535              	.LVL19:
+ 289:Core/Src/stm32f3xx_it.c **** 		}
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 16
+
+
+ 536              		.loc 1 289 4 view .LVU103
+ 537 005c 0548     		ldr	r0, .L34+16
+ 538 005e FFF7FEFF 		bl	stop_play_music
+ 539              	.LVL20:
+ 540 0062 D4E7     		b	.L30
+ 541              	.L35:
+ 542              		.align	2
+ 543              	.L34:
+ 544 0064 00000240 		.word	1073872896
+ 545 0068 00000000 		.word	hdma_tim17_ch1_up
+ 546 006c 00000000 		.word	htim17
+ 547 0070 00000000 		.word	buff_music
+ 548 0074 00000000 		.word	fil
+ 549 0078 00000000 		.word	fres
+ 550              	.LBE4:
+ 551              	.LBE3:
+ 552              		.cfi_endproc
+ 553              	.LFE133:
+ 555              		.section	.text.TIM1_TRG_COM_TIM17_IRQHandler,"ax",%progbits
+ 556              		.align	1
+ 557              		.global	TIM1_TRG_COM_TIM17_IRQHandler
+ 558              		.syntax unified
+ 559              		.thumb
+ 560              		.thumb_func
+ 562              	TIM1_TRG_COM_TIM17_IRQHandler:
+ 563              	.LFB134:
+ 298:Core/Src/stm32f3xx_it.c **** 
+ 299:Core/Src/stm32f3xx_it.c **** /**
+ 300:Core/Src/stm32f3xx_it.c ****   * @brief This function handles TIM1 trigger, commutation and TIM17 interrupts.
+ 301:Core/Src/stm32f3xx_it.c ****   */
+ 302:Core/Src/stm32f3xx_it.c **** void TIM1_TRG_COM_TIM17_IRQHandler(void)
+ 303:Core/Src/stm32f3xx_it.c **** {
+ 564              		.loc 1 303 1 view -0
+ 565              		.cfi_startproc
+ 566              		@ args = 0, pretend = 0, frame = 8
+ 567              		@ frame_needed = 0, uses_anonymous_args = 0
+ 568 0000 00B5     		push	{lr}
+ 569              	.LCFI9:
+ 570              		.cfi_def_cfa_offset 4
+ 571              		.cfi_offset 14, -4
+ 572 0002 83B0     		sub	sp, sp, #12
+ 573              	.LCFI10:
+ 574              		.cfi_def_cfa_offset 16
+ 304:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN TIM1_TRG_COM_TIM17_IRQn 0 */
+ 305:Core/Src/stm32f3xx_it.c **** 	if((TIM17->SR & TIM_SR_UIF) == TIM_SR_UIF)
+ 575              		.loc 1 305 2 view .LVU105
+ 576              		.loc 1 305 11 is_stmt 0 view .LVU106
+ 577 0004 1B4B     		ldr	r3, .L44
+ 578 0006 1B69     		ldr	r3, [r3, #16]
+ 579              		.loc 1 305 4 view .LVU107
+ 580 0008 13F0010F 		tst	r3, #1
+ 581 000c 14D0     		beq	.L37
+ 306:Core/Src/stm32f3xx_it.c **** 	{
+ 307:Core/Src/stm32f3xx_it.c **** 		TIM17->SR &= ~TIM_SR_UIF;
+ 582              		.loc 1 307 3 is_stmt 1 view .LVU108
+ 583              		.loc 1 307 13 is_stmt 0 view .LVU109
+ 584 000e 194A     		ldr	r2, .L44
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 17
+
+
+ 585 0010 1369     		ldr	r3, [r2, #16]
+ 586 0012 23F00103 		bic	r3, r3, #1
+ 587 0016 1361     		str	r3, [r2, #16]
+ 308:Core/Src/stm32f3xx_it.c **** 		if(tim17_counter == 500)
+ 588              		.loc 1 308 3 is_stmt 1 view .LVU110
+ 589              		.loc 1 308 20 is_stmt 0 view .LVU111
+ 590 0018 174B     		ldr	r3, .L44+4
+ 591 001a 1B88     		ldrh	r3, [r3]
+ 592              		.loc 1 308 5 view .LVU112
+ 593 001c B3F5FA7F 		cmp	r3, #500
+ 594 0020 10D0     		beq	.L42
+ 595              	.L38:
+ 309:Core/Src/stm32f3xx_it.c **** 		{
+ 310:Core/Src/stm32f3xx_it.c **** 			tim17_counter = 0;
+ 311:Core/Src/stm32f3xx_it.c **** 		}
+ 312:Core/Src/stm32f3xx_it.c **** 
+ 313:Core/Src/stm32f3xx_it.c **** 		if(tim17_counter == 0)
+ 596              		.loc 1 313 3 is_stmt 1 view .LVU113
+ 597              		.loc 1 313 20 is_stmt 0 view .LVU114
+ 598 0022 154B     		ldr	r3, .L44+4
+ 599 0024 1B88     		ldrh	r3, [r3]
+ 600              		.loc 1 313 5 view .LVU115
+ 601 0026 8BB1     		cbz	r3, .L43
+ 602              	.L39:
+ 314:Core/Src/stm32f3xx_it.c **** 		{
+ 315:Core/Src/stm32f3xx_it.c **** 			UINT bytesRead = 0;
+ 316:Core/Src/stm32f3xx_it.c **** 			fres = f_read(&fil, buff_music, sizeof(buff_music), &bytesRead);
+ 317:Core/Src/stm32f3xx_it.c **** 			if( bytesRead == 0 && fres == FR_OK)
+ 318:Core/Src/stm32f3xx_it.c **** 			{
+ 319:Core/Src/stm32f3xx_it.c **** 				stop_play_music(&fil);
+ 320:Core/Src/stm32f3xx_it.c **** 			}
+ 321:Core/Src/stm32f3xx_it.c **** 		}
+ 322:Core/Src/stm32f3xx_it.c **** 		TIM17->CCR1 = buff_music[tim17_counter];
+ 603              		.loc 1 322 3 is_stmt 1 view .LVU116
+ 604              		.loc 1 322 27 is_stmt 0 view .LVU117
+ 605 0028 134A     		ldr	r2, .L44+4
+ 606 002a 1388     		ldrh	r3, [r2]
+ 607 002c 1349     		ldr	r1, .L44+8
+ 608 002e C85C     		ldrb	r0, [r1, r3]	@ zero_extendqisi2
+ 609              		.loc 1 322 15 view .LVU118
+ 610 0030 1049     		ldr	r1, .L44
+ 611 0032 4863     		str	r0, [r1, #52]
+ 323:Core/Src/stm32f3xx_it.c **** 		tim17_counter++;
+ 612              		.loc 1 323 3 is_stmt 1 view .LVU119
+ 613              		.loc 1 323 16 is_stmt 0 view .LVU120
+ 614 0034 0133     		adds	r3, r3, #1
+ 615 0036 1380     		strh	r3, [r2]	@ movhi
+ 616              	.L37:
+ 324:Core/Src/stm32f3xx_it.c **** 	}
+ 325:Core/Src/stm32f3xx_it.c ****   /* USER CODE END TIM1_TRG_COM_TIM17_IRQn 0 */
+ 326:Core/Src/stm32f3xx_it.c ****   HAL_TIM_IRQHandler(&htim17);
+ 617              		.loc 1 326 3 is_stmt 1 view .LVU121
+ 618 0038 1148     		ldr	r0, .L44+12
+ 619 003a FFF7FEFF 		bl	HAL_TIM_IRQHandler
+ 620              	.LVL21:
+ 327:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN TIM1_TRG_COM_TIM17_IRQn 1 */
+ 328:Core/Src/stm32f3xx_it.c **** 
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 18
+
+
+ 329:Core/Src/stm32f3xx_it.c ****   /* USER CODE END TIM1_TRG_COM_TIM17_IRQn 1 */
+ 330:Core/Src/stm32f3xx_it.c **** }
+ 621              		.loc 1 330 1 is_stmt 0 view .LVU122
+ 622 003e 03B0     		add	sp, sp, #12
+ 623              	.LCFI11:
+ 624              		.cfi_remember_state
+ 625              		.cfi_def_cfa_offset 4
+ 626              		@ sp needed
+ 627 0040 5DF804FB 		ldr	pc, [sp], #4
+ 628              	.L42:
+ 629              	.LCFI12:
+ 630              		.cfi_restore_state
+ 310:Core/Src/stm32f3xx_it.c **** 		}
+ 631              		.loc 1 310 4 is_stmt 1 view .LVU123
+ 310:Core/Src/stm32f3xx_it.c **** 		}
+ 632              		.loc 1 310 18 is_stmt 0 view .LVU124
+ 633 0044 0C4B     		ldr	r3, .L44+4
+ 634 0046 0022     		movs	r2, #0
+ 635 0048 1A80     		strh	r2, [r3]	@ movhi
+ 636 004a EAE7     		b	.L38
+ 637              	.L43:
+ 638              	.LBB5:
+ 315:Core/Src/stm32f3xx_it.c **** 			fres = f_read(&fil, buff_music, sizeof(buff_music), &bytesRead);
+ 639              		.loc 1 315 4 is_stmt 1 view .LVU125
+ 315:Core/Src/stm32f3xx_it.c **** 			fres = f_read(&fil, buff_music, sizeof(buff_music), &bytesRead);
+ 640              		.loc 1 315 9 is_stmt 0 view .LVU126
+ 641 004c 0193     		str	r3, [sp, #4]
+ 316:Core/Src/stm32f3xx_it.c **** 			if( bytesRead == 0 && fres == FR_OK)
+ 642              		.loc 1 316 4 is_stmt 1 view .LVU127
+ 316:Core/Src/stm32f3xx_it.c **** 			if( bytesRead == 0 && fres == FR_OK)
+ 643              		.loc 1 316 11 is_stmt 0 view .LVU128
+ 644 004e 01AB     		add	r3, sp, #4
+ 645 0050 4FF4FA72 		mov	r2, #500
+ 646 0054 0949     		ldr	r1, .L44+8
+ 647 0056 0B48     		ldr	r0, .L44+16
+ 648 0058 FFF7FEFF 		bl	f_read
+ 649              	.LVL22:
+ 316:Core/Src/stm32f3xx_it.c **** 			if( bytesRead == 0 && fres == FR_OK)
+ 650              		.loc 1 316 9 view .LVU129
+ 651 005c 0A4B     		ldr	r3, .L44+20
+ 652 005e 1870     		strb	r0, [r3]
+ 317:Core/Src/stm32f3xx_it.c **** 			{
+ 653              		.loc 1 317 4 is_stmt 1 view .LVU130
+ 317:Core/Src/stm32f3xx_it.c **** 			{
+ 654              		.loc 1 317 18 is_stmt 0 view .LVU131
+ 655 0060 019B     		ldr	r3, [sp, #4]
+ 317:Core/Src/stm32f3xx_it.c **** 			{
+ 656              		.loc 1 317 6 view .LVU132
+ 657 0062 002B     		cmp	r3, #0
+ 658 0064 E0D1     		bne	.L39
+ 317:Core/Src/stm32f3xx_it.c **** 			{
+ 659              		.loc 1 317 23 discriminator 1 view .LVU133
+ 660 0066 0028     		cmp	r0, #0
+ 661 0068 DED1     		bne	.L39
+ 662              	.LBB6:
+ 319:Core/Src/stm32f3xx_it.c **** 			}
+ 663              		.loc 1 319 5 is_stmt 1 view .LVU134
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 19
+
+
+ 664 006a 0648     		ldr	r0, .L44+16
+ 665 006c FFF7FEFF 		bl	stop_play_music
+ 666              	.LVL23:
+ 667 0070 DAE7     		b	.L39
+ 668              	.L45:
+ 669 0072 00BF     		.align	2
+ 670              	.L44:
+ 671 0074 00480140 		.word	1073825792
+ 672 0078 00000000 		.word	tim17_counter
+ 673 007c 00000000 		.word	buff_music
+ 674 0080 00000000 		.word	htim17
+ 675 0084 00000000 		.word	fil
+ 676 0088 00000000 		.word	fres
+ 677              	.LBE6:
+ 678              	.LBE5:
+ 679              		.cfi_endproc
+ 680              	.LFE134:
+ 682              		.section	.text.EXTI15_10_IRQHandler,"ax",%progbits
+ 683              		.align	1
+ 684              		.global	EXTI15_10_IRQHandler
+ 685              		.syntax unified
+ 686              		.thumb
+ 687              		.thumb_func
+ 689              	EXTI15_10_IRQHandler:
+ 690              	.LFB135:
+ 331:Core/Src/stm32f3xx_it.c **** 
+ 332:Core/Src/stm32f3xx_it.c **** /**
+ 333:Core/Src/stm32f3xx_it.c ****   * @brief This function handles EXTI line[15:10] interrupts.
+ 334:Core/Src/stm32f3xx_it.c ****   */
+ 335:Core/Src/stm32f3xx_it.c **** void EXTI15_10_IRQHandler(void)
+ 336:Core/Src/stm32f3xx_it.c **** {
+ 691              		.loc 1 336 1 view -0
+ 692              		.cfi_startproc
+ 693              		@ args = 0, pretend = 0, frame = 0
+ 694              		@ frame_needed = 0, uses_anonymous_args = 0
+ 695 0000 08B5     		push	{r3, lr}
+ 696              	.LCFI13:
+ 697              		.cfi_def_cfa_offset 8
+ 698              		.cfi_offset 3, -8
+ 699              		.cfi_offset 14, -4
+ 337:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+ 338:Core/Src/stm32f3xx_it.c **** 	HAL_Delay(600);
+ 700              		.loc 1 338 2 view .LVU136
+ 701 0002 4FF41670 		mov	r0, #600
+ 702 0006 FFF7FEFF 		bl	HAL_Delay
+ 703              	.LVL24:
+ 339:Core/Src/stm32f3xx_it.c ****   /* USER CODE END EXTI15_10_IRQn 0 */
+ 340:Core/Src/stm32f3xx_it.c ****   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
+ 704              		.loc 1 340 3 view .LVU137
+ 705 000a 4FF48060 		mov	r0, #1024
+ 706 000e FFF7FEFF 		bl	HAL_GPIO_EXTI_IRQHandler
+ 707              	.LVL25:
+ 341:Core/Src/stm32f3xx_it.c ****   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
+ 708              		.loc 1 341 3 view .LVU138
+ 709 0012 4FF40060 		mov	r0, #2048
+ 710 0016 FFF7FEFF 		bl	HAL_GPIO_EXTI_IRQHandler
+ 711              	.LVL26:
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 20
+
+
+ 342:Core/Src/stm32f3xx_it.c ****   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
+ 712              		.loc 1 342 3 view .LVU139
+ 713 001a 4FF48050 		mov	r0, #4096
+ 714 001e FFF7FEFF 		bl	HAL_GPIO_EXTI_IRQHandler
+ 715              	.LVL27:
+ 343:Core/Src/stm32f3xx_it.c ****   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
+ 716              		.loc 1 343 3 view .LVU140
+ 717 0022 4FF40050 		mov	r0, #8192
+ 718 0026 FFF7FEFF 		bl	HAL_GPIO_EXTI_IRQHandler
+ 719              	.LVL28:
+ 344:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
+ 345:Core/Src/stm32f3xx_it.c **** 
+ 346:Core/Src/stm32f3xx_it.c ****   /* USER CODE END EXTI15_10_IRQn 1 */
+ 347:Core/Src/stm32f3xx_it.c **** }
+ 720              		.loc 1 347 1 is_stmt 0 view .LVU141
+ 721 002a 08BD     		pop	{r3, pc}
+ 722              		.cfi_endproc
+ 723              	.LFE135:
+ 725              		.section	.rodata.TIM6_DAC_IRQHandler.str1.4,"aMS",%progbits,1
+ 726              		.align	2
+ 727              	.LC4:
+ 728 0000 2564200D 		.ascii	"%d \015\012\000"
+ 728      0A00
+ 729              		.section	.text.TIM6_DAC_IRQHandler,"ax",%progbits
+ 730              		.align	1
+ 731              		.global	TIM6_DAC_IRQHandler
+ 732              		.syntax unified
+ 733              		.thumb
+ 734              		.thumb_func
+ 736              	TIM6_DAC_IRQHandler:
+ 737              	.LFB136:
+ 348:Core/Src/stm32f3xx_it.c **** 
+ 349:Core/Src/stm32f3xx_it.c **** /**
+ 350:Core/Src/stm32f3xx_it.c ****   * @brief This function handles TIM6 global interrupt, DAC interrupts.
+ 351:Core/Src/stm32f3xx_it.c ****   */
+ 352:Core/Src/stm32f3xx_it.c **** void TIM6_DAC_IRQHandler(void)
+ 353:Core/Src/stm32f3xx_it.c **** {
+ 738              		.loc 1 353 1 is_stmt 1 view -0
+ 739              		.cfi_startproc
+ 740              		@ args = 0, pretend = 0, frame = 0
+ 741              		@ frame_needed = 0, uses_anonymous_args = 0
+ 742 0000 10B5     		push	{r4, lr}
+ 743              	.LCFI14:
+ 744              		.cfi_def_cfa_offset 8
+ 745              		.cfi_offset 4, -8
+ 746              		.cfi_offset 14, -4
+ 354:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
+ 355:Core/Src/stm32f3xx_it.c **** 	if((TIM6->SR & TIM_SR_UIF) == TIM_SR_UIF)
+ 747              		.loc 1 355 2 view .LVU143
+ 748              		.loc 1 355 10 is_stmt 0 view .LVU144
+ 749 0002 1F4B     		ldr	r3, .L52
+ 750 0004 1B69     		ldr	r3, [r3, #16]
+ 751              		.loc 1 355 4 view .LVU145
+ 752 0006 13F0010F 		tst	r3, #1
+ 753 000a 31D0     		beq	.L49
+ 356:Core/Src/stm32f3xx_it.c **** 	{
+ 357:Core/Src/stm32f3xx_it.c **** 		TIM16->SR &= ~TIM_SR_UIF;
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 21
+
+
+ 754              		.loc 1 357 3 is_stmt 1 view .LVU146
+ 755              		.loc 1 357 13 is_stmt 0 view .LVU147
+ 756 000c 1D4A     		ldr	r2, .L52+4
+ 757 000e 1369     		ldr	r3, [r2, #16]
+ 758 0010 23F00103 		bic	r3, r3, #1
+ 759 0014 1361     		str	r3, [r2, #16]
+ 358:Core/Src/stm32f3xx_it.c **** 		if(((GPIOC->IDR & GPIO_ODR_10) == 0) || !HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_10))
+ 760              		.loc 1 358 3 is_stmt 1 view .LVU148
+ 761              		.loc 1 358 13 is_stmt 0 view .LVU149
+ 762 0016 1C4B     		ldr	r3, .L52+8
+ 763 0018 1B69     		ldr	r3, [r3, #16]
+ 764              		.loc 1 358 5 view .LVU150
+ 765 001a 13F4806F 		tst	r3, #1024
+ 766 001e 05D0     		beq	.L50
+ 767              		.loc 1 358 44 discriminator 1 view .LVU151
+ 768 0020 4FF48061 		mov	r1, #1024
+ 769 0024 1848     		ldr	r0, .L52+8
+ 770 0026 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 771              	.LVL29:
+ 772              		.loc 1 358 40 discriminator 1 view .LVU152
+ 773 002a 08BB     		cbnz	r0, .L49
+ 774              	.L50:
+ 775              	.LBB7:
+ 359:Core/Src/stm32f3xx_it.c **** 		{
+ 360:Core/Src/stm32f3xx_it.c **** 			printf("%d \r\n", HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_10));
+ 776              		.loc 1 360 4 is_stmt 1 view .LVU153
+ 777              		.loc 1 360 22 is_stmt 0 view .LVU154
+ 778 002c 164C     		ldr	r4, .L52+8
+ 779 002e 4FF48061 		mov	r1, #1024
+ 780 0032 2046     		mov	r0, r4
+ 781 0034 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 782              	.LVL30:
+ 783 0038 0146     		mov	r1, r0
+ 784              		.loc 1 360 4 view .LVU155
+ 785 003a 1448     		ldr	r0, .L52+12
+ 786 003c FFF7FEFF 		bl	printf
+ 787              	.LVL31:
+ 361:Core/Src/stm32f3xx_it.c **** 			GPIOC->ODR &= ~GPIO_IDR_3;
+ 788              		.loc 1 361 4 is_stmt 1 view .LVU156
+ 789              		.loc 1 361 15 is_stmt 0 view .LVU157
+ 790 0040 6369     		ldr	r3, [r4, #20]
+ 791 0042 23F00803 		bic	r3, r3, #8
+ 792 0046 6361     		str	r3, [r4, #20]
+ 362:Core/Src/stm32f3xx_it.c **** 			f_close(&fil);
+ 793              		.loc 1 362 4 is_stmt 1 view .LVU158
+ 794 0048 1148     		ldr	r0, .L52+16
+ 795 004a FFF7FEFF 		bl	f_close
+ 796              	.LVL32:
+ 363:Core/Src/stm32f3xx_it.c **** 			HAL_Delay(10);
+ 797              		.loc 1 363 4 view .LVU159
+ 798 004e 0A20     		movs	r0, #10
+ 799 0050 FFF7FEFF 		bl	HAL_Delay
+ 800              	.LVL33:
+ 364:Core/Src/stm32f3xx_it.c **** 			f_mount(NULL, "", 0);
+ 801              		.loc 1 364 4 view .LVU160
+ 802 0054 0022     		movs	r2, #0
+ 803 0056 0F49     		ldr	r1, .L52+20
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 22
+
+
+ 804 0058 1046     		mov	r0, r2
+ 805 005a FFF7FEFF 		bl	f_mount
+ 806              	.LVL34:
+ 365:Core/Src/stm32f3xx_it.c **** 			HAL_TIM_Base_Stop_IT(&htim6);
+ 807              		.loc 1 365 4 view .LVU161
+ 808 005e 0E48     		ldr	r0, .L52+24
+ 809 0060 FFF7FEFF 		bl	HAL_TIM_Base_Stop_IT
+ 810              	.LVL35:
+ 366:Core/Src/stm32f3xx_it.c **** 			HAL_DMA_Abort_IT(&hdma_adc1);
+ 811              		.loc 1 366 4 view .LVU162
+ 812 0064 0D48     		ldr	r0, .L52+28
+ 813 0066 FFF7FEFF 		bl	HAL_DMA_Abort_IT
+ 814              	.LVL36:
+ 367:Core/Src/stm32f3xx_it.c **** 			//HAL_ADC_Stop_DMA(&hadc1);
+ 368:Core/Src/stm32f3xx_it.c **** 			HAL_ADC_Stop(&hadc1);
+ 815              		.loc 1 368 4 view .LVU163
+ 816 006a 0D48     		ldr	r0, .L52+32
+ 817 006c FFF7FEFF 		bl	HAL_ADC_Stop
+ 818              	.LVL37:
+ 819              	.L49:
+ 820              	.LBE7:
+ 369:Core/Src/stm32f3xx_it.c **** 		}
+ 370:Core/Src/stm32f3xx_it.c **** 	}
+ 371:Core/Src/stm32f3xx_it.c ****   /* USER CODE END TIM6_DAC_IRQn 0 */
+ 372:Core/Src/stm32f3xx_it.c ****   HAL_TIM_IRQHandler(&htim6);
+ 821              		.loc 1 372 3 view .LVU164
+ 822 0070 0948     		ldr	r0, .L52+24
+ 823 0072 FFF7FEFF 		bl	HAL_TIM_IRQHandler
+ 824              	.LVL38:
+ 373:Core/Src/stm32f3xx_it.c ****   HAL_DAC_IRQHandler(&hdac);
+ 825              		.loc 1 373 3 view .LVU165
+ 826 0076 0B48     		ldr	r0, .L52+36
+ 827 0078 FFF7FEFF 		bl	HAL_DAC_IRQHandler
+ 828              	.LVL39:
+ 374:Core/Src/stm32f3xx_it.c ****   /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
+ 375:Core/Src/stm32f3xx_it.c **** 
+ 376:Core/Src/stm32f3xx_it.c ****   /* USER CODE END TIM6_DAC_IRQn 1 */
+ 377:Core/Src/stm32f3xx_it.c **** }
+ 829              		.loc 1 377 1 is_stmt 0 view .LVU166
+ 830 007c 10BD     		pop	{r4, pc}
+ 831              	.L53:
+ 832 007e 00BF     		.align	2
+ 833              	.L52:
+ 834 0080 00100040 		.word	1073745920
+ 835 0084 00440140 		.word	1073824768
+ 836 0088 00080048 		.word	1207961600
+ 837 008c 00000000 		.word	.LC4
+ 838 0090 00000000 		.word	fil
+ 839 0094 3C000000 		.word	.LC3
+ 840 0098 00000000 		.word	htim6
+ 841 009c 00000000 		.word	hdma_adc1
+ 842 00a0 00000000 		.word	hadc1
+ 843 00a4 00000000 		.word	hdac
+ 844              		.cfi_endproc
+ 845              	.LFE136:
+ 847              		.text
+ 848              	.Letext0:
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 23
+
+
+ 849              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 850              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 851              		.file 4 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f302x8.h"
+ 852              		.file 5 "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f3xx.h"
+ 853              		.file 6 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_def.h"
+ 854              		.file 7 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_dma.h"
+ 855              		.file 8 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_adc_ex.h"
+ 856              		.file 9 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_adc.h"
+ 857              		.file 10 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_dac.h"
+ 858              		.file 11 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_tim.h"
+ 859              		.file 12 "Middlewares/Third_Party/FatFs/src/integer.h"
+ 860              		.file 13 "Middlewares/Third_Party/FatFs/src/ff.h"
+ 861              		.file 14 "<built-in>"
+ 862              		.file 15 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_gpio.h"
+ 863              		.file 16 "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h"
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 24
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f3xx_it.c
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:20     .text.NMI_Handler:00000000 $t
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:26     .text.NMI_Handler:00000000 NMI_Handler
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:44     .text.HardFault_Handler:00000000 $t
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:50     .text.HardFault_Handler:00000000 HardFault_Handler
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:67     .text.MemManage_Handler:00000000 $t
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:73     .text.MemManage_Handler:00000000 MemManage_Handler
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:90     .text.BusFault_Handler:00000000 $t
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:96     .text.BusFault_Handler:00000000 BusFault_Handler
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:113    .text.UsageFault_Handler:00000000 $t
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:119    .text.UsageFault_Handler:00000000 UsageFault_Handler
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:136    .text.SVC_Handler:00000000 $t
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:142    .text.SVC_Handler:00000000 SVC_Handler
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:155    .text.DebugMon_Handler:00000000 $t
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:161    .text.DebugMon_Handler:00000000 DebugMon_Handler
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:174    .text.PendSV_Handler:00000000 $t
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:180    .text.PendSV_Handler:00000000 PendSV_Handler
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:193    .text.SysTick_Handler:00000000 $t
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:199    .text.SysTick_Handler:00000000 SysTick_Handler
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:242    .text.SysTick_Handler:00000020 $d
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:248    .rodata.DMA1_Channel1_IRQHandler.str1.4:00000000 $d
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:261    .text.DMA1_Channel1_IRQHandler:00000000 $t
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:267    .text.DMA1_Channel1_IRQHandler:00000000 DMA1_Channel1_IRQHandler
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:427    .text.DMA1_Channel1_IRQHandler:000000bc $d
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:447    .text.DMA1_Channel7_IRQHandler:00000000 $t
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:453    .text.DMA1_Channel7_IRQHandler:00000000 DMA1_Channel7_IRQHandler
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:544    .text.DMA1_Channel7_IRQHandler:00000064 $d
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:556    .text.TIM1_TRG_COM_TIM17_IRQHandler:00000000 $t
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:562    .text.TIM1_TRG_COM_TIM17_IRQHandler:00000000 TIM1_TRG_COM_TIM17_IRQHandler
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:671    .text.TIM1_TRG_COM_TIM17_IRQHandler:00000074 $d
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:683    .text.EXTI15_10_IRQHandler:00000000 $t
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:689    .text.EXTI15_10_IRQHandler:00000000 EXTI15_10_IRQHandler
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:726    .rodata.TIM6_DAC_IRQHandler.str1.4:00000000 $d
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:730    .text.TIM6_DAC_IRQHandler:00000000 $t
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:736    .text.TIM6_DAC_IRQHandler:00000000 TIM6_DAC_IRQHandler
+C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s:834    .text.TIM6_DAC_IRQHandler:00000080 $d
+
+UNDEFINED SYMBOLS
+HAL_IncTick
+Timer1
+Timer2
+HAL_GPIO_ReadPin
+f_close
+HAL_Delay
+f_mount
+HAL_TIM_Base_Stop_IT
+HAL_DMA_Abort_IT
+HAL_ADC_Stop
+HAL_DMA_IRQHandler
+f_lseek
+printf
+f_write
+puts
+old_fsize
+fil
+fres
+ARM GAS  C:\Users\Akira\AppData\Local\Temp\cciIqrN8.s 			page 25
+
+
+adc_counter
+htim6
+hdma_adc1
+hadc1
+buff_music
+HAL_TIM_PWM_Stop_DMA
+f_read
+HAL_TIM_PWM_Start_DMA
+stop_play_music
+hdma_tim17_ch1_up
+htim17
+HAL_TIM_IRQHandler
+tim17_counter
+HAL_GPIO_EXTI_IRQHandler
+HAL_DAC_IRQHandler
+hdac

@@ -1,0 +1,10 @@
+.gitignore
+.cproject
+.cproject.bak
+.mxproject
+.project
+.project.bak
+Makefile
+music_1 Debug.launch
+music_1.ioc
+build

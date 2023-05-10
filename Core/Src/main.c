@@ -37,6 +37,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define SIZE_OF_BUFFER 	500
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -45,7 +46,12 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
- I2C_HandleTypeDef hi2c1;
+ ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
+
+DAC_HandleTypeDef hdac;
+
+I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi2;
 
@@ -68,11 +74,6 @@ DWORD	old_fptr;			/* File read/write pointer (Zeroed on file open) */
 DWORD	old_fsize;			/* File size */
 uint8_t buff_music[SIZE_OF_BUFFER];
 
-struct
-{
-	int var_recording : 1;
-	int sampling_timer : 4;
-}general;
 
 struct
 {
@@ -88,6 +89,7 @@ struct
 }display_status;
 
 uint16_t tim17_counter;
+uint32_t adc_counter;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -99,6 +101,8 @@ static void MX_USART1_UART_Init(void);
 static void MX_DMA_Init(void);
 static void MX_TIM17_Init(void);
 static void MX_TIM6_Init(void);
+static void MX_ADC1_Init(void);
+static void MX_DAC_Init(void);
 /* USER CODE BEGIN PFP */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 void start_play_music(const TCHAR* path);
@@ -118,9 +122,8 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	memset(buff_music, 0, sizeof(buff_music));
-	general.var_recording = 0;
-	general.sampling_timer = 0;
 	tim17_counter = 0;
+	adc_counter = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -148,6 +151,8 @@ int main(void)
   MX_DMA_Init();
   MX_TIM17_Init();
   MX_TIM6_Init();
+  MX_ADC1_Init();
+  MX_DAC_Init();
   /* USER CODE BEGIN 2 */
   process_SD_card();
 
@@ -216,6 +221,104 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+  hadc1.Init.ContinuousConvMode = ENABLE;   ////// !!!!!!!!!!!!!!!!!
+  hadc1.Init.DMAContinuousRequests = ENABLE; //////////!!!!!!!!!!   ENABLE is from lcd displej
+  /* USER CODE END ADC1_Init 1 */
+
+  /** Common config
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc1.Init.Resolution = ADC_RESOLUTION_8B;
+  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.DMAContinuousRequests = ENABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc1.Init.LowPowerAutoWait = DISABLE;
+  hadc1.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_4;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SingleDiff = ADC_SINGLE_ENDED;
+  sConfig.SamplingTime = ADC_SAMPLETIME_7CYCLES_5;
+  sConfig.OffsetNumber = ADC_OFFSET_1;
+  sConfig.Offset = 154;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
+}
+
+/**
+  * @brief DAC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_DAC_Init(void)
+{
+
+  /* USER CODE BEGIN DAC_Init 0 */
+
+  /* USER CODE END DAC_Init 0 */
+
+  DAC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN DAC_Init 1 */
+
+  /* USER CODE END DAC_Init 1 */
+
+  /** DAC Initialization
+  */
+  hdac.Instance = DAC;
+  if (HAL_DAC_Init(&hdac) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** DAC channel OUT1 config
+  */
+  sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
+  sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
+  if (HAL_DAC_ConfigChannel(&hdac, &sConfig, DAC_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN DAC_Init 2 */
+
+  /* USER CODE END DAC_Init 2 */
+
 }
 
 /**
@@ -324,7 +427,7 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 64;
+  htim6.Init.Prescaler = 128;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim6.Init.Period = 10000;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -455,6 +558,9 @@ static void MX_DMA_Init(void)
   /* DMA1_Channel1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+  /* DMA1_Channel7_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 2, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
 
 }
 
@@ -533,7 +639,7 @@ void process_SD_card( void )
 	fil.fsize = old_fsize;
 	if (fres == FR_OK) {
 	    UINT bytesWritten;
-	    f_lseek(&fil, f_size(&fil) /*sizeof(fil)*/);
+	    f_lseek(&fil, f_size(&fil));
 	    DWORD size_of_fil;
 	    size_of_fil = f_size(&fil);
 	    printf("size of file 1 : %d \r\n", size_of_fil);
@@ -545,7 +651,6 @@ void process_SD_card( void )
 				// Data written successfully
 				f_close(&fil);  // Close the file
 				printf("Data written to file: data_file.txt \r\n");
-				//printf("strlen(buff_adc1) == %d   	sizeof(buff_adc1) == %d \r\n", strlen(buff_adc1), sizeof(buff_adc1));
 			} else {
 				// Error occurred while writing data
 				f_close(&fil);  // Close the file
@@ -661,7 +766,15 @@ HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		else if(display_status.page == 2 && display_status.cursor_line ==0) //New recording
 		{
 			GPIOC->ODR |= GPIO_ODR_3;
+			f_close(&fil);
+			f_mount(NULL, "", 0);
+			fres = f_mount(&FatFs, "", 1);
+			fres = f_open(&fil, "0:/data/rec.wav", FA_WRITE | FA_READ | FA_CREATE_ALWAYS);
 			HAL_TIM_Base_Start_IT(&htim6);
+			ADC1->CFGR |= ADC_CFGR_DMACFG;
+			ADC1->CFGR |= ADC_CFGR_DMAEN;
+			HAL_ADC_Start(&hadc1);
+			HAL_DMA_Start_IT(&hdma_adc1, &(ADC1->DR), (uint32_t)buff_music, sizeof(buff_music));
 		}
 		else if(display_status.page == 2 && display_status.cursor_line ==1) //Listen record
 		{
